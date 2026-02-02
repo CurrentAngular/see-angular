@@ -29,7 +29,9 @@ export class SseService {
       // Конструктор new Observable позволяет создать адаптер
       // Внутри него мы создаем физическое соединение new EventSource(...), а затем вручную переводим события из eventSource в observer.next(...)
       this.eventSource$ = new Observable<EventsSource>((observer) => {
-        const eventSource = new EventSource(`${this.baseUrl}/api/event`);
+        const eventSource = new EventSource(`${this.baseUrl}/api/event`, {
+          withCredentials: true, // ВАЖНО: отправляем куки с запросом
+        });
 
         // Обработка входящих данных (onmessage)
         eventSource.onmessage = (event: MessageEvent) => {
@@ -52,6 +54,10 @@ export class SseService {
         // Мы же просто логируем ошибку, позволяя браузеру тихо переподключиться и продолжить отправку данных в observer.next
         eventSource.onerror = (error) => {
           console.error('SSE Connection Error:', error);
+          // Если ошибка 401 (нет авторизации), можно обработать
+          if (eventSource.readyState === EventSource.CLOSED) {
+            observer.error('Connection closed - possibly unauthorized');
+          }
         };
 
         // Если все компоненты, которые слушали этот поток, удалились или отписались, вызывается eventSource.close()
@@ -75,5 +81,10 @@ export class SseService {
     }
 
     return this.eventSource$;
+  }
+
+  // Сбрасываем подключение (например, после logout)
+  resetConnection(): void {
+    this.eventSource$ = null;
   }
 }
