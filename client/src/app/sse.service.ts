@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, share, map } from 'rxjs';
+import { Observable, share } from 'rxjs';
 import { EventsSource } from './sse.interface';
 
 /**
@@ -54,7 +54,7 @@ export class SseService {
         // Мы же просто логируем ошибку, позволяя браузеру тихо переподключиться и продолжить отправку данных в observer.next
         eventSource.onerror = (error) => {
           console.error('SSE Connection Error:', error);
-          // Если ошибка 401 (нет авторизации), можно обработать
+          // Если ошибка авторизации
           if (eventSource.readyState === EventSource.CLOSED) {
             observer.error('Connection closed - possibly unauthorized');
           }

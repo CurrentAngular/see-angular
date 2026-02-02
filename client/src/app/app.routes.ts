@@ -1,7 +1,14 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: 'events', loadComponent: () => import('./sse.component').then((m) => m.SseComponent) },
-  { path: '', redirectTo: '/events', pathMatch: 'full' },
-  { path: '**', redirectTo: '/events' },
+  {
+    path: 'login',
+    loadComponent: () => import('./auth/login.component').then((m) => m.LoginComponent),
+  },
+  {
+    path: 'events',
+    loadComponent: () => import('./sse.component').then((m) => m.SseComponent),
+  },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login' },
 ];
